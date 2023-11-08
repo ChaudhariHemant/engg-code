@@ -1,0 +1,57 @@
+ pratical--3
+// SPDX-License-Identifier: MIT
+pragma solidity >=0.7.0 <0.9.0;
+contract DBank {
+ address Owner;
+ mapping(address => uint) Balance;
+ constructor() {
+ Owner = msg.sender;
+ }
+ function addBalance(uint amount) public returns (uint) {
+ require(msg.sender == Owner, "Yes, it is the Owner's Account!!");
+ Balance[msg.sender] += amount;
+ return Balance[msg.sender];
+ }
+ function getBalance() public view returns (uint) {
+ return Balance[msg.sender];
+ }
+ function Transfer(address recipient, uint amount) public {
+ require(msg.sender != recipient, "Can't Transfer!! Self Account.");
+ require(Balance[msg.sender] >= amount, "No, We Can't Transfer. Insufficient Balance!!");
+ _transfer(msg.sender, recipient, amount);
+ }
+ function _transfer(address From, address To, uint Amount) private {
+ Balance[From] -= Amount;
+ Balance[To] += Amount;
+ }
+}
+------------------------------------------------------
+
+pratc-4
+// SPDX-License-Identifier: MIT
+pragma solidity >=0.7.0 <0.9.0;
+contract MarksManagmtSys {
+ struct Student {
+ int ID;
+ string fName;
+ string lName;
+ int marks;
+ }
+ address owner;
+ int public stdCount = 0;
+ mapping(int => Student) public stdRecords;
+ modifier onlyOwner {
+ require(owner == msg.sender);
+ _;
+ }
+ constructor() {
+ owner = msg.sender;
+ }
+ function addNewRecords(int _ID, string memory _fName, string memory _lName, int _marks) public onlyOwner {
+ stdCount += 1;
+ stdRecords[stdCount] = Student(_ID, _fName, _lName, _marks);
+ }
+ function bonusMarks(int _bonus) public onlyOwner {
+ stdRecords[stdCount].marks += _bonus;
+ }
+}
