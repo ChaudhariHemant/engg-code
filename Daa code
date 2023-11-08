@@ -1,0 +1,325 @@
+Assignment 1: Fibonacci Series Iterative and Recursive
+#include <iostream>
+using namespace std;
+int iStepFibonacci(int n) {
+if (n <= 1)
+return n;
+int a = 0, b = 1, fib;
+for (int i = 2; i <= n; i++) {
+fib = a + b;
+a = b;
+b = fib;
+}
+return fib;
+}
+int rStepFibonacci(int n) {
+if (n <= 1)
+return n;
+return rStepFibonacci(n - 1) + rStepFibonacci(n - 2);
+}
+int main() {
+int n;
+cout << "Fibonacci Value : ";
+cin >> n;
+rStepFibonacci(n);
+cout << "Steps required using Iteration : " << n << '\n';
+cout << "Steps required using recursion : " << n * 2 - 1 << '\n';
+return 0;
+}
+/*
+Recursive Fibonacci:
+Time Complexity: O(2^n)
+Space: O(n), for the recursion call stack.
+Iterative Fibonacci:
+Time Complexity: O(n)
+Space: O(1)
+*/
+INPUT:6
+OUTPUT:
+Fibbonacci Value : 8
+Steps required using Iteration : 6
+Steps required using recursion : 11
+------------------------------------------------------------
+Assignment 2: Huffman Coding
+#include <bits/stdc++.h>
+using namespace std;
+struct MinHeapNode {
+char data;
+int freq;
+MinHeapNode* left, *right;
+MinHeapNode(char data, int freq) : data(data), freq(freq), left(nullptr),
+right(nullptr) {}
+};
+void printCodes(MinHeapNode* root, string str) {
+if (root == nullptr) {
+return;
+}
+if (root->data != '$') {
+cout << root->data << ": " << str << endl;
+}
+printCodes(root->left, str + "0");
+printCodes(root->right, str + "1");
+}
+struct compare {
+bool operator()(MinHeapNode* a, MinHeapNode* b) {
+return a->freq > b->freq;
+}
+};
+void HuffmanCode(char data[], int freq[], int size) {
+priority_queue<MinHeapNode*, vector<MinHeapNode*>, compare> minHeap;
+for (int i = 0; i < size; i++) {
+minHeap.push(new MinHeapNode(data[i], freq[i]));
+}
+while (minHeap.size() != 1) {
+MinHeapNode* left = minHeap.top();
+minHeap.pop();
+MinHeapNode* right = minHeap.top();
+minHeap.pop();
+MinHeapNode* temp = new MinHeapNode('$', left->freq + right->freq);
+temp->left = left;
+temp->right = right;
+minHeap.push(temp);
+}
+printCodes(minHeap.top(), "");
+}
+int main() {
+int n;
+cout << "Enter the number of characters: ";
+cin >> n;
+char data[n];
+int freq[n];
+cout << "Enter characters and their frequencies: " << endl;
+for (int i = 0; i < n; i++) {
+cin >> data[i] >> freq[i];
+}
+HuffmanCode(data, freq, n);
+return 0;
+}
+Inputs:
+Enter the number of characters: 4
+Enter characters and their frequencies:
+A 23
+B 12
+C 34
+D 10
+Ouputs:
+C: 0
+D: 100
+B: 101
+A: 11
+/*
+Huffman Coding :
+Time complexity: O(nlogn)
+Space Complexity: O(n)
+*/
+---------------------------------------------------------------
+Assignment 3: Fractional Knapsack
+#include <iostream>
+#include <vector>
+#include <algorithm>
+using namespace std;
+struct Item {
+int price;
+int weight;
+};
+bool compare(Item a, Item b) {
+double ratio1 = (double)a.price / a.weight;
+double ratio2 = (double)b.price / b.weight;
+return ratio1 < ratio2; // Sort in ascending order of price-to-weight ratio
+}
+int main() {
+int capacity; // Knapsack capacity
+int items; // Number of items
+cout << "Enter the capacity of the Knapsack: ";
+cin >> capacity;
+cout << "Enter the number of items: ";
+cin >> items;
+vector<Item> itemList(items);
+cout << "Enter the prices and weights of items: " << endl;
+for (int i = 0; i < items; i++) {
+cin >> itemList[i].price >> itemList[i].weight;
+}
+sort(itemList.begin(), itemList.end(), compare);
+double maxProfit = 0.0;
+vector<double> fractions(items, 0.0);
+for (int i = 0; i < items; i++) {
+if (capacity >= itemList[i].weight) {
+fractions[i] = 1.0;
+maxProfit += itemList[i].price;
+capacity -= itemList[i].weight;
+} else {
+fractions[i] = (double)capacity / itemList[i].weight;
+maxProfit += fractions[i] * itemList[i].price;
+break;
+}
+}
+cout << "\nMaximum Profit Earned: " << maxProfit << endl;
+cout << "Selected Items and Their Fractions: { ";
+for (int i = 0; i < items; i++) {
+cout << i + 1 << ": " << fractions[i];
+if (i < items - 1) {
+cout << ", ";
+}
+}
+cout << " }" << endl;
+return 0;
+}
+Input:
+Enter the capacity of the Knapsack: 13
+Enter the number of items: 5
+Enter the prices and weights of items:
+10 2
+15 3
+7 5
+8 7
+12 10
+Maximum Profit Earned: 15.2
+Selected Items and Their Fractions: { 1: 1, 2: 0.6, 3: 0, 4: 0, 5: 0 }
+-----------------------------------------------------------------------------------
+Assignment 4: 0/1 Knapsack
+#include <iostream>
+#include <vector>
+#include <algorithm>
+using namespace std;
+struct Item {
+ int price;
+ int weight;
+};
+bool compare(Item a, Item b) {
+ double ratio1 = (double)a.price / a.weight;
+ double ratio2 = (double)b.price / b.weight;
+ return ratio1 > ratio2;
+}
+int main() {
+ int capacity; // Knapsack capacity
+ int items; // Number of items
+ cout << "Enter the capacity of the Knapsack: ";
+ cin >> capacity;
+ cout << "Enter the number of items: ";
+ cin >> items;
+ vector<Item> itemList(items);
+ cout << "Enter the prices and weights of items: " << endl;
+ for (int i = 0; i < items; i++) {
+ cin >> itemList[i].price >> itemList[i].weight;
+ }
+ sort(itemList.begin(), itemList.end(), compare);
+ vector<vector<int>> dp(items + 1, vector<int>(capacity + 1, 0));
+ for (int i = 1; i <= items; i++) {
+ for (int w = 0; w <= capacity; w++) {
+ if (itemList[i - 1].weight <= w) {
+ dp[i][w] = max(dp[i - 1][w], dp[i - 1][w - itemList[i -
+1].weight] + itemList[i - 1].price);
+ } else {
+ dp[i][w] = dp[i - 1][w];
+ }
+ }
+ }
+ int maxProfit = dp[items][capacity];
+ cout << "\nMaximum Profit Earned: " << maxProfit << endl;
+ vector<int> selectedItems(items, 0);
+ int i = items, j = capacity;
+ while (i > 0 && j > 0) {
+ if (dp[i][j] != dp[i - 1][j]) {
+ selectedItems[i - 1] = 1;
+ j -= itemList[i - 1].weight;
+ }
+ i--;
+ }
+ cout << "Selected Items: { ";
+ for (int i = 0; i < items; i++) {
+ if (selectedItems[i] == 1) {
+ cout << i + 1;
+ if (i < items - 1) {
+ cout << ", ";
+ }
+ }
+ }
+ cout << " }" << endl;
+ return 0;
+}
+OUTPUT:
+Enter the capacity of the Knapsack: 23
+Enter the number of items: 5
+Enter the prices of items: 7 4 5 3 2
+Enter the weights of items: 4 3 2 7 5
+Maximum Profit Earned: 21
+Solution X: { 1,2,3,4,5,}
+----------------------------------------------------------
+Assignment 5: N-Queen
+#include<bits/stdc++.h>
+using namespace std;
+bool isSafe(int **arr, int x, int y, int n){
+for(int row=0;row<x;row++){
+if(arr[row][y]==1){
+return false;}}
+int row =x;
+int col =y;
+while(row>=0 && col>=0){
+if(arr[row][col]==1){
+return false;}
+row--;
+col--;
+}
+row =x;
+col =y;
+while(row>=0 && col<n){
+if(arr[row][col]==1){
+return false;
+}
+row--;
+col++;
+}
+return true;
+}
+void printBoard(int **arr, int n){
+for(int i=0;i<n;i++){
+for(int j=0;j<n;j++){
+if(arr[i][j] == 1) cout << "[Q]";
+else cout << "[]";
+}
+cout << endl;
+}
+cout << endl;
+cout << endl;
+}
+void nQueen(int** arr, int x, int n){
+if(x == n){
+printBoard(arr, n);
+return;
+}
+for(int col=0;col<n;col++){
+if(isSafe(arr,x,col,n)){
+arr[x][col]=1;
+nQueen(arr,x+1,n);
+arr[x][col]=0;}
+}
+}
+int main() {
+int n;
+std::cout << "Enter the value of N: ";
+std::cin >> n;
+int **arr = new int *[n];
+for (int i = 0; i < n; i++) {
+arr[i] = new int[n];
+for (int j = 0; j < n; j++) {
+arr[i][j] = 0;
+}
+}
+nQueen(arr, 0, n);
+std::cout << "--------All possible solutions-------- ";
+return 0;
+}
+/*
+Time Complexity: O(N!)
+Auxiliary Space: O(N^2)
+*/
+OUTPUT:
+Enter the value of N: 4
+[][Q][][]
+[][][][Q]
+[Q][][][]
+[][][Q][]
+[][][Q][]
+[Q][][][]
+[][][][Q]
+[][Q][][]
